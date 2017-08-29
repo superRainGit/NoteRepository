@@ -1,0 +1,70 @@
+﻿[Mysql]常用的笔记
+一、创建表之后生成的一些文件的作用：
+	FRM文件：存放表结构
+	myd文件：存放数据
+	myi文件：存放索引
+二、Mysql中一些常用的语句
+	创建单值索引的语句：
+		create index 索引的名称 on 表名(字段名)
+		alter table 表名 add index 索引的名称 (字段名)
+	删除索引的语句：
+		drop index 索引的名称 on 表名
+		alter table 表名 drop index 索引的名称
+	查看某个表上的索引：
+		show index from 表名
+		show keys from 表名
+三、Mysql的小笔记
+	Sql语句的书写的顺序：
+		SELECT DISTINCT <SELECT_LIST>
+		FROM <LFET_TABLE> <JOIN_TYPE> JOIN
+		RIGHT <RIGHT_TABLE> ON <JOIN_CONDITION>
+		WHERE <WHERE_CONDITION>
+		GROUP BY <GROUP_LIST>
+		HAVING <HAVING_CONDITION>
+		ORDER BY <ORDER_BY_CONDITION>
+		LIMIT <LIMIT_NUMBER>
+
+		where和having的区别：
+			where字句的作用是在对结果进行分组前过滤数据
+			having字句的作用是筛选满足条件的组，即在分组之后进行数据的过滤，使用having条件过滤的是特定的组
+	Sql语句机器读取的顺序：
+		FROM <LEFT_TABLE> ON <JOIN_CONDITION>
+		<JOIN_TYPE> JOIN <RIGHT_TABLE>
+		WHERE <WHERE_CONDITION>
+		GROUP BY <GROUP_BY_LIST>
+		HAVING <HAVING_CONDITION>
+		SELECT DISTINCT <SELECT_LIST>
+		ORDER BY <ORDER_BY_CONDITION>
+		LIMIT <LIMIT_NUMBER>
+	Group By字句对SELECT指定的字段的限制：
+		在SELECT指定的字段要么就包含在Group By语句的后面作为分组的依据；要么就放在Sql语句支持的聚合函数中。但是Myql对Group By语句进行了改进，它可以存在不满足上述规则的语句的存在进行查询，此时Mysql会默认在查询语句的后面加上limit 1操作，这样返回的只有一条数据，此时返回的数据有可能跟需要的数据不符。
+	各种各样的Join语句：
+		LEFT JOIN：
+			SELECT * FROM A LEFT JOIN B ON A.ID = B.ID [查出的结果是A的独有+A和B的共有]
+		RIGHT JOIN：
+			SELECT * FROM A RIGHT JOIN B ON A.ID = B.ID [查出的结果是B的独有+A和B的共有]
+		INNER JOIN
+			SELECT * FROM A INNER JOIN B ON A.ID = B.ID [查出的结果是A和B的共有]
+		单独取出A：
+			SELECT * FROM A LEFT JOIN B ON A.ID = B.ID WHERE B.ID IS NULL [取出A的独有]
+		单独取出B：
+			SELECT * FROM A RIGHT JOIN B ON A.ID = B.ID WHERE A.ID IS NULL [取出B的独有]
+		取出所有数据并且去重：
+			SELECT * FROM A LEFT JON B ON A.ID = B.ID 
+			UNION
+			SELECT * FROM A RIGHT JOIN B ON A.ID = B.ID
+		取出除A和B共有的数据：
+			SELECT * FROM A LEFT JOIN B ON A.ID = B.ID WHERE B.ID IS NULL
+			UNION
+			SELECT * FROM A RIGHT JOIN B ON A.ID = B.ID WHERE A.ID IS NULL
+	索引：
+		索引[Index]是帮助Mysql高效获取的数据结构[索引本身是一种数据结构]
+		优势：
+			提高数据的检索效率，降低IO
+			本身对数据进行了排序，降低数据的排序成本，降低CPU消耗
+		劣势：
+			索引的构建也需要占用空间
+			会降低数据表更新的速度
+			需要花时间去进行数据库索引的优化
+	使用Explain查看Sql的执行计划：
+		
