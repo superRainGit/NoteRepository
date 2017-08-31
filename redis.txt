@@ -1,0 +1,151 @@
+﻿[redis]
+一、Redis的一些通用命令
+	keys + pattern ：筛选出符合pattern规则的键[keys *]
+	exists + key ：判断某个key是否存在于数据库中
+	del + key ：删除某个key对应的值
+	type + key ：得到某个key对应的value的类型
+二、Redis的数据类型
+	字符串类型：
+		Redis最基本的数据类型，能存储任意形式的字符串，包括二进制数据。你可以用它来存储用户的邮箱、JSON化的对象甚至一张图片的二进制。
+	字符串类型对应的命令：
+		赋值和取值命令：
+			get key
+			set key value
+		如果存入的值是数值类型的数据，可以对其进行增加或者减少：
+			当对应的值不是数值类型的时候，会提示error
+			incr key [步进为1]
+			incrby key increment [步进为指定的increment] 
+			decr key [步进为1的减少]
+			decr key decrment [步进为指定的decrment的减少]
+			incrbyfloat key increment [可以指定增加的量为浮点数]
+		向尾部追加值：
+			append key value
+			如果key存在则向后加，如果不存在则直接设置为值
+		获取字符串的长度：
+			strlen key[返回的是对应的字节数，中文使用UTF-8的字符编码进行存储，因此一个中文表示的是三个字节]
+		同时设置/获取多个键值
+			mget k1 k2 k3...
+			mset k1 v1 k2 v2...
+	散列类型：
+		Redis采用字典结构以键值对的形式进行数据的存储，同时散列类型(hash)的键值也是一种字典结构，其存储了字段和字段值的映射，但字段值只能是字符串，不支持其他类型的数据类型。
+	散列类型对应的命令：
+		赋值与取值：
+			hset key field val
+			hget key field
+			hmset key field1 val1 field2 val2...
+			hmget key field1 field2...
+			hgetall
+		判断字段是否存在：
+			hexists key field
+		当字段不存在时赋值：
+			hsetnx key field val
+			此命令与hset key field val 类似，区别在于如果字段已经存在，hsetnx不会进行任何的操作
+		指定的字段值增加数字：
+			hincrby key field increment
+		删除字段：
+			hdel key field1 field2...
+		只获取字段名或字段值：
+			hkeys key
+			hvals key
+		获取字段数量：
+			hlen key
+	列表类型：
+		可以存储一个有序的字符串列表，常用的操作就是向列表两端添加元素，或者获取列表的某一个片段。
+	列表类型的命令：
+		向列表两端添加元素：
+			lpush key val...
+			rpush keu val...
+		从列表两端弹出元素：
+			lpop key
+			rpop key
+		获取列表中元素的个数：
+			llen key
+		获取列表片段：
+			lrange key start end [此列表的返回包括右端的数据]
+			lrange命令也支持负索引，表示从右边开始计数，如"-1"表示从右边数第一个，因此lrange 0 -1表示获取所有列表的数据。
+		删除列表中指定的值：
+			lrem key count value
+			lrem命令会删除列表中前count个值为value的元素，当count>0的时候，会从列表的左边开始删除前count个value，当count<0时，会从列表的右边开始删除前|count|个value，当count=0时会删除所有的value指定的值
+		获得/设置指定索引的元素值：
+			lindex key index
+			lset key index val
+			索引默认从0开始，如果index是负数，表示从列表的右端进行计算，右端的第一个索引是-1。
+		只保留列表的指定片段：
+			ltrim key start end
+			删除指定索引范围之外的所有元素，其指定列表的范围的方法和lrange命令相同。
+			ltrim和lrange通常一起使用来限制列表中元素的数量，例如日志我们只希望保留100条，那么可以在lrange之后使用ltrim key 0 99只截取前100条。
+		向列表中插入元素：
+			linsert key before|after pivot value
+			先从左到右在列表中查找值为pivot的元素，然后根据before或者after在查找到的元素的前面或者后面插入对应的值；如果没有找到值为pivot的元素，那么该命令不会进行其他的任何操作。
+		将元素从一个列表转移到另一个列表：
+			rpoplpush source destination
+			从源数据的末尾拿出一个数据放到目标数据开始，如果source和destination指定为同一个列表，那么就会形成循环队列。
+	集合类型：
+		集合中的每个元素都是不同的，且没有顺序，集合类型和列表类型有相似之处，但很容易区分开来。
+	集合类型的命令：
+		增加和删除元素：
+			sadd key val1 val2...
+			srem key val1 val2...
+			sadd向指定的集合中填充元素，如果集合不存在，那么就自动创建这样的集合，因为集合中的元素是不能重复的，所以在添加相同的元素之后，集合会将其忽略。
+		获取集合中的所有元素：
+			smembers key
+		判断元素是否在集合中：
+			sismember key member
+		集合间的运算：
+			sdiff key key2 key3...
+			sinter key key2 key3...
+			sunion key key2 key3...
+			sdiff：用来对多个集合执行差集运算，集合A与集合B的差集表示为A-B，即属于A但是不属于B的元素构成的集合；因为sdiff支持多个集合进行差集运算，多个集合进行运算时，从左向右的进行运算，即sdiff A B C计算的顺序是先计算A与B的差集，然后在将获得的结果与C进行差集的运算。
+			sinter：用来对多个集合执行交集运算，即同时属于A又属于B的一种运算。同样的，它也支持多个集合一起运算，运算的规则和sdiff一样。
+			sunion：用来对多个集合进行并集运算，即A和B两个集合所有的元素的和。同样的，它也支持多个集合一起运算，运算的规则和sdiff一样。
+		获得集合中元素的个数：
+			scard key
+		随机获取集合中的元素：
+			srandmember key [count]
+			如果不指定count，那么Redis会随机的从集合中获取一个元素。如果指定了count，那么如果count>0，
+会从集合中获取count个随机的元素，并且这些元素是不同的，这样可以用来进行抽奖等操作；如果count<0，那么会从集合中获取|count|个随机的元素，但是不保证元素是不同的。
+			当然，如果我们使用srandmember命令会发现一些值的出现并不是那么的随机[限于那些指定count为负数的情况，因为如果指定的是正数，不会出现相同的元素]，这是因为集合类型的存储采用的是散列表构成的。散列函数会将元素进行散列然后放入到指定的存储位置上来实现O(1)时间复杂度的元素查找，并且Redis解决这种散列冲突使用的是拉链法，即可以看出放入到集合中的元素是采用的类似于Java语言中的HashMap的结构。在使用srandmember命令从集合中随机取得一个元素时，Redis首先会从所有的存储位置上随机选一个存储位置，然后再从存储位置上的所有元素中随机选择一个元素，所以元素所在的存储位置上的元素越少，元素被选中的概率就越大。
+		从集合中弹出一个元素：
+			spop key
+			因为集合本身是无序的，所以弹出一个元素，也是无序的。
+	有序集合类型：
+		在集合类型的基础上有序集合类型为集合中的每个元素都关联了一个分数，这使得我们不仅可以完成插入、删除和判断元素是否存在等集合类型支持的操作，还能获得分数最高(或最低)的前N个元素、获取指定分数范围内的元素等与分数有关的操作。
+	有序集合命令：
+		增加元素：
+			zadd key score member
+			会向有序集合中加入一个元素和该元素的分数，如果该元素已经存在则会用新的分数将原来的分数进行替换。
+		获得元素的分数：
+			zscore key member
+		获得排名在某个范围内的元素列表：
+			zrange key start end [withscores]
+			zrevrange key start end [withscores]
+			会按照元素分数从小到大的顺序返回索引从start到end之间的所有元素(包括两端的元素)，zrange同lrange一样，如索引都是从0开始，负数代表从后向前查找。如果同时想要获得元素对应的分数，可以在这个命令的后面加上withscores，如果两个元素的分数相同，Redis会按照字典顺序来进行排列。zrevrange与zrange的唯一不同在于zrevrange命令是按照分数从大到小排列的。
+		获得指定分数范围内的元素：
+			zrangebyscore key min max [withscores] [limit offset count]
+			zrevrangebyscore key max min [withscores] [limit offset count]
+			该命令按照元素分数从大到小的顺序返回分数在min和max[包括min和max]之间的元素。如果希望不包含端点值，可以在分数的前面加上"("来表示不包含；同时min和max还支持无穷大，-inf和+inf分别表示负无穷大和正无穷大；withscores参数的用法同zrange一样；limit off set与Sql语句中的用法基本相同，即在获得元素列表的基础上向后偏移offset个元素，并且只获得前count个元素。zrevrangebyscore与zrangebyscore的作用正好反过来。
+			例子：zrangebyscore zset01 60 +inf withscores limit 1 3
+			从zset01有序集合中获取分数大于60分的人，然后在从第二个人开始挑出前三个来进行展示
+		增加某个元素的分数：
+			zincrby key increment member
+			同样的，可以使用负增长来表示递减；如果对应的元素不存在，那么Redis会在创建它之后先将对应的score赋值为0再进行加或者减。
+			例子：zincrby zset01 10 nana
+			为zset01中的nana增加10分
+		获取有序集合中元素的个数：
+			zcard key
+		获取指定分数范围内的元素个数：
+			zcount key min max
+			这个命令的min和max参数的特性与zrangescore命令的一样，同样支持不包含和负无穷大和正无穷大。
+		删除一个或多个元素
+			zrem key member1 member2...
+			例子：zrem zset01 m1 m2
+		按照排名范围删除元素：
+			zremrangebyrank key start end
+			按照元素分数从小到大的顺序(即索引0表示最小的值)删除在指定排名范围内的所有元素。
+		按照分数范围删除元素：
+			zremrangebyscore key min max
+			会删除指定分数范围内的所有元素，参数min和max的特性和zrangebyscore中的一样。
+		获得元素的排名：
+			zrank key member
+			zrevrank key member
+			zrank命令会按照元素分数从大到小的顺序获得指定的元素的排名(从0开始，即分数最小的元素排名为0)，zrevrange命令同它正好相反。
