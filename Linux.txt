@@ -95,3 +95,8 @@
 	多个文件打开的情况下：
 		:qa[关闭所有文件]
 		:only[只剩下当前光标在的文件，关闭其他文件]
+	常用的git命令：
+		git status
+		git config
+		git add .
+
