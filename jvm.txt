@@ -1,0 +1,32 @@
+[jvm]
+一、Eclipse的启动文件的配置文件中的基本配置信息
+	-Xms256m[最小的堆内存]
+	-Xmx1024m[最大的堆内存]
+二、使用JDK自带的Jvm监视器去观察jvm的使用情况
+	在命令行键入：jvisualVm打开对应的管理界面
+三、在Eclipse的启动文件中进行配置
+	-verbose:gc
+	-XX:+PrintGCDetails
+	-XX:+PrintGCDateStamps
+	-Xloggc:gc.log[如果配置其他的路径日志文件没有生成出来，不知道啥情况]
+四、jvm的一些简单的配置
+	-Xms512m：指定最小的堆内存
+	-Xmx1024m：指定最大的堆内存
+	-XX:NewSize=400m：指定新生代的初始化内存
+	-XX:MaxNewSize=400m：指定新生代的最大内存
+	-XX:PermSize=100m：指定年老代的初始化内存
+	-XX:MaxPermSize=100m：指定年老代的最大内存
+五、JVM运行时的一些内存区域的划分情况
+	堆
+	栈
+	方法区
+	程序计数器
+六、垃圾收集器的一些算法
+	标记清除算法
+	复制算法
+	标记整理
+	分代收集算法
+七、垃圾收集器
+	[新生代的收集器]
+	Serial：串行收集器
+	Pe人New：并行收集器

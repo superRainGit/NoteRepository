@@ -48,8 +48,33 @@
 	剪切或者改名：
 		mv 源文件 目标目录
 		如果源文件和目标文件在同一个目录下就是改名字[即如同Windows下的重命名]，否则就是剪切
+	将标准输入输出到文件
+		tee
 二、一些简单的小笔记
+	在Liunx[Centos]系统下安装Docker
+		1.首先要查看Linux系统的内核版本是不是大于3.10，使用的命令是uname -a
+		显示的效果是
+		2.其次要保证yum安装是最新的，即使用yum update进行yum安装的更新
+		3.然后添加yum仓库
+		$ tee /etc/yum.repos.d/docker.repo <<-'EOF' 
+		[dockerrepo] 
+		name=Docker Repository 
+		baseurl=https://yum.dockerproject.org/repo/main/centos/$releasever/ 
+		enabled=1 
+		gpgcheck=1 
+		gpgkey=https://yum.dockerproject.org/gpg 
+		EOF
+		4.使用yum安装Docker
+		5.启动Docker
+		6.查看Docker的版本号，来查看是否安装Docker
 三、遇到的一些问题和解决办法	
+	1.使用Docker的pull命令下载远程镜像的时候
+		有可能出现如下的错误：
+			error pulling image configuration: Get https://dseasb33srnrn.cloudfront.net/registry-v2/docker/registry/v2/blobs/sha256/f2/f2a91732366c0332ccd7af			d2a5c4ff2b9af81f549370f7a19acd460f87686bc7/data?Expires=1512643417&Signature=QGWrhhiOpHCfeqf0uETbJ0QA-pFx6FUSVeiLmVMjUtf8h4cJ07OT3lICNYGaRJM3pSkp7			i4GY9UMYipvSeMQhno-IR5U8lT4gln3~-KX4tqJ8yq-0dd4JNFrwt1LE8hcGUYFpd-KfBF4VKFPFhAIRlkEdrcq1ga2JF1C20AEWHg_&Key-Pair-Id=APKAJECH5M7VWIS5YZ6Q: 
+			x509: certificate has expired or is not yet valid
+			主要的错误是X509证书过期，一般的原因是系统时间不正确导致的
+		解决办法：
+			可以使用ntpdate cn.pool.ntp.org命令进行时间的同步
 四、Vim编辑命令
 	Vim同时编辑多个文件：
 		vim -o file1 file2 [横向显示多个要打开的文件]		

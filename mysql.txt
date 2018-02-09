@@ -492,10 +492,10 @@
 	位运算符：&、|、~、^、<<、>>
 十三、使用MYSQL常用函数
 	字符串函数：
-		CANCAT(str1, str2...strn)：连接字符串str1, str2...strn为一个完整字符串
-		INSERT(str, x, y, instr)：将字符串str从第x位置开始的，y个字符长的子串替换成instr
-		LOWER(str)：将字符串str中所有字符变为小写
-		UPPER(str)：将字符串str中所有字符变为大写
+		CANCAT(str1, str2...strn)：连接字符串str1, str2...strn为一个完整字符串，如果其中的一个参数为NULL，则返回值为NULKL；同时还有一个CONCAT_WS(SEP, str1, str2...strn)，与CONCAT相比，多了一个SEP参数，该方法不仅将传入的其他参数连接起来，而且会通过分隔符将各个字符串分隔开。如果分隔符为NULL，返回的结果就是NULL；只要分隔符不是NULL，那么将会忽略后面参数中的NULL值
+		INSERT(str, x, y, instr)：将字符串str从第x位置开始的，y个字符长的子串替换成instr；REPLCAE(str, substr, newstr)上述函数会将字符串中的子字符串substr使用字符串newstr进行替代
+		LOWER(str)：将字符串str中所有字符变为小写，LCASE(str)
+		UPPER(str)：将字符串str中所有字符变为大写，UCASE(str)
 		LEFT(str, x)：返回字符串str中最左边的x个字符
 		RIGHT(str, x)：返回字符串str中最右边的x个字符
 		LPAD(str, n, pad)：使用字符串pad对字符串str最左边进行填充，直到长度为n个字符长度
@@ -503,6 +503,91 @@
 		LTRIM(str)：去掉字符串str左边的空格
 		RTRIM(str)：去掉字符串str右边的空格
 		REPEAT(str, x)：返回字符串str重复x此的结果
-		STRCMP(str1, str2)：比较字符串str1和str2
+		STRCMP(str1, str2)：比较字符串str1和str2，如果参数str1大于str2，则返回结果1；如果参数str1小于str2，则返回结果-1；如果两个参数相等，则返回结果0。
 		TRIM(str)：去掉字符串str行头和行尾的空格
 		SUBSTRING(str, x, y)：返回字符串str中从x位置起y个字符长度的字符串
+		LENGTH(str)：获取字符串str的长度(此长度是字节长度，英文占1个字节，中文占2个字节)，CHAR_LENGTH(str)用来获取字符串str的字符数目(即该字符串有多少个字符)
+	数值函数：
+		ABS(x)：返回数值x的绝对值
+		CEIL(x)：返回大于x的最大整数值
+		FLOOR(x)：返回小于x的最大整数值
+		MOD(x, y)：返回x模y的值
+		RAND()：返回0~1内的随机数，RAND(x)函数也可以获取随机数，其中RAND()获取的随机数是完全随机的，但是RAND(x)返回的随机数值是相同的。
+		ROUND(x, y)：返回数值x的四舍五入后有y位小数的数值
+		TRUNCATE(x, y)：返回数值x截断y位小数的数值
+	日期和时间函数：
+		CURDATE()：获取当前日期。CURRENT_DATE()
+		CURTIME()：获取当前时间。CURRENT_TIME()
+		NOW()：获取当前的日期和时间。CURRENT_TIMESTAMP()、LOCALTIME()、SYSDATE()
+		UNIX_TIMESTAMP(date)：获取日期date的UNIX时间戳
+		FROM_UNIXTIME()：获取UNIX时间戳的日期值
+		WEEK(date)：返回日期date为一年中的第几周。WEEKOFYEAR(date)，取值范围是[1-53]。DAYOFWEEK(date)返回日期date是当前星期的星期几，返回值是1~7，返回值1代表星期日，2代表星期一；DAYNAME(date)返回日期和时间中星期的英文名；WEEKDAY(date)返回日期date是当前星期的星期几，返回值是0~6，如果返回值0代表星期一，1代表星期二。
+		QUARTER(date)：返回日期date属于第几个季度
+		MONTH(date)：返回日期date属于第几个月
+		YEAR(date)：返回日期date的年份，取值范围是[1-12]
+		HOUR(time)：返回时间time的小时值
+		MINUTE(time)：返回时间time的分钟值
+		SECOND(time)：返回时间time的秒
+		MONTHNAME(time)：返回时间time的月份值，以英文的形式进行显示(如五月代表May)
+		DAYOFMONTH(date)：返回日期属于当前月的第几天；DAYOFYEAR(date)返回日期属于今年的第几天
+		EXTRACT(type FROM date)：该函数会从日期和时间参数date中获取指定参数类型参数type值，关于type参数的取值可以是YEAR、MONTH、DAY、HOUR、MINUTE和SECOND。
+		计算时间和日期的函数
+			TO_DAYS(date)：该函数计算日期参数date与默认日期和时间(0000年1月1日)之间间隔的天数
+			FROM_DAYS(number)：该函数计算从默认时间和日期(0000年1月1日)开始经历number天后的日期和时间。
+			DATEDIFF(date1, date2)：上述函数会返回日期参数date1与date2之间相隔天数。
+			ADDDATE(date, n)：该函数计算日期参数date加上n天后的日期
+			SUBDATE(date, n)：该函数计算日期参数date减去n天后的日期
+			ADDTIME(time, n)：该函数计算时间参数time加上n秒后的时间
+			SUBTIME(time, n)：该函数计算时间参数time减去n秒后的时间
+		系统信息函数
+			VERSION()：返回数据库的版本号
+			DATABASE()：返回当前数据库名，如果没有使用数据库则返回NULL
+			USER()：返回当前用户
+		流程函数：
+			IF(VALUE, t f)：如果VALUE为真，返回t，否则返回f
+			IFNULL(value1, value2)：如果value1不为空则返回value1，否则返回value2
+			CASE WHEN value1 THEN result1... ELSE default END：如果value1为真，返回result1，否则返回default
+			CASE expr WHEN value1 THEN result1... ELSE default END：如果expr等于value1，返回result1，否则返回default
+		特殊功能函数：
+			PASSWORD(str)：实现对字符串str进行加密
+			FORMAT(x, n)：实现对数字x进行格式化，保留n位小数
+			INET_ATON(ip)：实现将IP地址转换成数字
+			INET_NTOA(x)：实现将数字转换成IP
+十四、存储过程和函数的操作
+	创建存储过程和函数
+		创建存储过程的语法形式：
+			CREATE PROCEDURE procedure_name([procedure_parameter]...)
+				[characteristic...] routine_body
+			procedure_parameter：[IN|OUT|INOUT] parameter_name type
+			characteristic：参数的取值
+				LANGUAGE SQL：表示存储过程的routine_body部分由SQL语言的语句组成，为MYSQL软件所有默认语句
+				[NOT]DETERMINISTIC：表示存储过程的执行结果是否确定，如果值为DETERMINISTIC，表示执行结果是确定的，即每次执行存储过程的时候，如果输入相同的参数得到相同的输出；如果值为NOT DETERMINISTIC，表示执行结果不确定，即相同的输入可能得到不同的输出，默认是DETERMINISTIC。
+				{CONTAINS SQL|NO SQL|READS SQL DATA|MODIFIES SQL DATA}：表示使用SQL语句的限制。如果值为CONTAINS SQL表示可以包含SQL语句，但不包含读或写数据的语句；如果值为NO SQL表示不包含SQL语句；如果值为READS SQL DATA表示包含读数据的语句；如果值为MODIFIES SQL DATA表示包含写数据语句。默认是CONTAINS SQL
+				SQL SECURITY {DEFINER|INVOKER}：设置谁有权限来执行，如果值为DEFINER，表示只有定义者自己能够执行；如果值为INVOKER表示调用者可以执行。默认值为DEFINER
+				COMMENT 'str'：表示注释语句
+		创建函数的语法形式：
+			CREATE FUNCTION funciton_name([function_parameter]...)
+				[characteristic...] routine_body
+			function_parameter：parameter_name type
+	关于存储过程和函数的表达式
+		操作变量
+			声明变量：
+				DECLARE var_name[,...] type [DEFAULT value]：var_name参数表示所有声明的变量名字；参数type表示所有声明变量的类型；DEFAULT value用来实现设置变量的默认值，如果无该语句默认值为NULL。在具体声明变量时，可以同时定义多个变量。
+			赋值变量：
+				SET var_name=expr[,...]：var_name参数表示所要赋值变量的名字；参数expr是关于变量的赋值表达式。在为变量赋值时，可以同时为多个变量赋值，各个变量的赋值语句之间用逗号隔开；为变量赋值时，除了上述语法，还可以通过关键字"SELECT ... INTO "语句来实现，其语法形式如下：
+				SELECT field_name[,...] INTO var_name[,...] FROM tbl_name WHERE condition
+				field_name表示查询的字段名，参数var_name参数表示变量名
+				当将查询结果赋值给变量时，该查询语句的返回结果只能是单行。
+十五、MySQL事务
+	事务概述：
+		事务有以下4个特性：
+			原子性：事务中的所有操作视为一个原子单元，即对于事务进行的数据修改只能是完全提交或者完全回滚。
+			一致性：事务在完成之后，必须使所有的数据从一种一致性变更成为另外一个一致性
+			隔离性：一个事务中的操作语句所做的修改必须与其他事务所做的修改相隔离
+			持久性：事务完成之后，所在的修改对数据的影响是永久的
+		MySQL事务隔离级别：
+			SET GLOBAL TRANSACTION ISOLATION LEVEL + 
+				READ UNCOMMITED
+				READ COMMITED
+				REPEATABLE READ
+				SERIALIZABLE
